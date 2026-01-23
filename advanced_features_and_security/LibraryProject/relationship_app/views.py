@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.views.generic.detail import DetailView
 
 from .models import Book, Library
- 
 
 
 # -------- AUTH VIEW --------
@@ -35,6 +34,7 @@ class LibraryDetailView(DetailView):
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
 
+
 # -------- ROLE CHECK FUNCTIONS --------
 
 def is_admin(user):
@@ -63,36 +63,41 @@ def librarian_view(request):
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
 
-@permission_required('relationship_app.can_add_book', raise_exception=True)
+
+# -------- PERMISSION-BASED BOOK VIEWS --------
+
+@permission_required('relationship_app.can_create', raise_exception=True)
 def add_book(request):
     if request.method == "POST":
         title = request.POST.get('title')
         author = request.POST.get('author')
-        published_date = request.POST.get('published_date')
+        publication_year = request.POST.get('publication_year')
 
         Book.objects.create(
             title=title,
             author=author,
-            published_date=published_date
+            publication_year=publication_year
         )
         return redirect('list_books')
 
     return render(request, 'relationship_app/add_book.html')
 
-@permission_required('relationship_app.can_change_book', raise_exception=True)
+
+@permission_required('relationship_app.can_edit', raise_exception=True)
 def edit_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
     if request.method == "POST":
         book.title = request.POST.get('title')
         book.author = request.POST.get('author')
-        book.published_date = request.POST.get('published_date')
+        book.publication_year = request.POST.get('publication_year')
         book.save()
         return redirect('list_books')
 
     return render(request, 'relationship_app/edit_book.html', {'book': book})
 
-@permission_required('relationship_app.can_delete_book', raise_exception=True)
+
+@permission_required('relationship_app.can_delete', raise_exception=True)
 def delete_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
