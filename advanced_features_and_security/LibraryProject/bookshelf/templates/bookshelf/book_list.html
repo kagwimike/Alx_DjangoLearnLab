@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book List</title>
+</head>
+<body>
+
+<h1>Books</h1>
+
+<!-- Secure search form with CSRF token -->
+<form method="get">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Search</button>
+</form>
+
+<ul>
+    {% for book in books %}
+        <li>{{ book.title|escape }}</li>
+    {% empty %}
+        <li>No books available.</li>
+    {% endfor %}
+</ul>
+
+</body>
+</html>
