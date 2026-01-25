@@ -16,23 +16,24 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']  # Update for your production domain
 
-# Force HTTPS
+# ----------------- HTTPS & SECURE HEADERS -----------------
 SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
+SECURE_HSTS_SECONDS = 31536000  # Force HTTPS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
-# HTTP Strict Transport Security (HSTS)
-SECURE_HSTS_SECONDS = 31536000  # Instruct browsers to only use HTTPS for 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
-SECURE_HSTS_PRELOAD = True  # Enable preload for browsers
+# Trust proxy headers for HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Secure cookies
-SESSION_COOKIE_SECURE = True  # Only send session cookies over HTTPS
-CSRF_COOKIE_SECURE = True     # Only send CSRF cookies over HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Browser security protections
-SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filter
-SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"  # Prevent clickjacking
-
+  
 # ----------------- APPLICATIONS -----------------
 INSTALLED_APPS = [
     'django.contrib.admin',
