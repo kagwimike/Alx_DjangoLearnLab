@@ -6,6 +6,9 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.decorators import permission_required
 from .models import Book, Library
 from .forms import BookForm
+from django.views.generic.detail import DetailView
+from .models import Library
+
 
 # Function-based view: list all books
 def list_books(request):
