@@ -1,8 +1,16 @@
-<form method="POST">
-    {% csrf_token %}
-    
-    <label>Title:</label>
-    <input type="text" name="title">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Example Form</title>
+</head>
+<body>
+    <h2>Example Form</h2>
 
-    <button type="submit">Submit</button>
-</form>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+
+</body>
+</html>
