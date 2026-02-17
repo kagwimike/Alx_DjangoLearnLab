@@ -1,24 +1,27 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ==============================
+# ==================================================
 # SECURITY SETTINGS
-# ==============================
+# ==================================================
 
-# NEVER expose this in production
-SECRET_KEY = 'django-insecure-75b_u5aw-!iss@rtcn+6)%r25p8%+59q$+hv8c+zj69t%s)eh#'
+# In production, store this in environment variables
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-75b_u5aw-!iss@rtcn+6)%r25p8%+59q$+hv8c+zj69t%s)eh#"
+)
 
 # Set to False in production
 DEBUG = False
 
-# Add your production domain here
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
-# ==============================
+# ==================================================
 # APPLICATIONS
-# ==============================
+# ==================================================
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -32,22 +35,24 @@ INSTALLED_APPS = [
     'relationship_app',
     'django_models',
 
-    # For Content Security Policy
+    # Content Security Policy
     'csp',
 ]
 
-# Custom user model
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
 
 
-# ==============================
+# ==================================================
 # MIDDLEWARE
-# ==============================
+# ==================================================
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # Required for HTTPS & HSTS
     'django.middleware.common.CommonMiddleware',
+
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -57,13 +62,12 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
 ]
 
-
 ROOT_URLCONF = 'LibraryProject.urls'
 
 
-# ==============================
+# ==================================================
 # TEMPLATES
-# ==============================
+# ==================================================
 
 TEMPLATES = [
     {
@@ -83,9 +87,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'LibraryProject.wsgi.application'
 
 
-# ==============================
+# ==================================================
 # DATABASE
-# ==============================
+# ==================================================
 
 DATABASES = {
     'default': {
@@ -95,9 +99,9 @@ DATABASES = {
 }
 
 
-# ==============================
+# ==================================================
 # PASSWORD VALIDATION
-# ==============================
+# ==================================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -107,9 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# ==============================
+# ==================================================
 # INTERNATIONALIZATION
-# ==============================
+# ==================================================
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -117,41 +121,60 @@ USE_I18N = True
 USE_TZ = True
 
 
-# ==============================
+# ==================================================
 # STATIC FILES
-# ==============================
+# ==================================================
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-# ==============================
-# SECURITY ENHANCEMENTS
-# ==============================
+# ==================================================
+# HTTPS & HSTS CONFIGURATION
+# ==================================================
 
-# Prevent MIME sniffing
-SECURE_CONTENT_TYPE_NOSNIFF = True
+# Redirect all HTTP traffic to HTTPS
+SECURE_SSL_REDIRECT = True
 
-# Enable browser XSS filtering
-SECURE_BROWSER_XSS_FILTER = True
+# HTTP Strict Transport Security (1 year)
+SECURE_HSTS_SECONDS = 31536000
+
+# Apply HSTS to subdomains
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# Allow HSTS preload
+SECURE_HSTS_PRELOAD = True
+
+
+# ==================================================
+# SECURE COOKIES
+# ==================================================
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+
+# ==================================================
+# SECURE HEADERS
+# ==================================================
 
 # Prevent clickjacking
 X_FRAME_OPTIONS = "DENY"
 
-# Force HTTPS cookies
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+# Prevent MIME sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
-# Redirect HTTP to HTTPS
-SECURE_SSL_REDIRECT = True
+# Enable browser XSS protection
+SECURE_BROWSER_XSS_FILTER = True
 
 
-# ==============================
+# ==================================================
 # CONTENT SECURITY POLICY (CSP)
-# ==============================
+# ==================================================
 
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'",)
 CSP_STYLE_SRC = ("'self'",)
 CSP_IMG_SRC = ("'self'",)
+CSP_FONT_SRC = ("'self'",)
