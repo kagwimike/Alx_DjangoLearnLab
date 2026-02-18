@@ -59,3 +59,14 @@ CSRF protection enabled
 Authentication required for sensitive operations
 
 Author ownership enforced in views
+
+
+Add Comment: post/<int:pk>/comment/ – authenticated users only
+
+Edit Comment: comment/<int:pk>/update/ – only author
+
+Delete Comment: comment/<int:pk>/delete/ – only author
+
+Comments appear in post_detail.html under each post.
+
+Forms use CSRF protection and proper validation.
