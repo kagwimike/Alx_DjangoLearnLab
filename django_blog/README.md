@@ -31,3 +31,31 @@ Passwords hashed automatically
 @login_required decorator used
 
 Django’s secure authentication backend used
+
+Blog Post Management Features
+This project implements full CRUD functionality for blog posts using Django Class-Based Views.
+
+Features:
+List all posts
+
+View single post
+
+Create new post (authenticated users only)
+
+Edit post (author only)
+
+Delete post (author only)
+
+Permissions:
+LoginRequiredMixin restricts creation
+
+UserPassesTestMixin ensures only authors can edit/delete
+
+Public users can view posts
+
+Security:
+CSRF protection enabled
+
+Authentication required for sensitive operations
+
+Author ownership enforced in views
