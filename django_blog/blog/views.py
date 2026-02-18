@@ -3,8 +3,9 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.contrib import messages
+from django.db.models import Q
 
 from .models import Post, Comment
 from .forms import RegisterForm, ProfileUpdateForm, CommentForm
@@ -13,8 +14,9 @@ from .forms import RegisterForm, ProfileUpdateForm, CommentForm
 # ------------------------
 # Home & Authentication
 # ------------------------
+
 def home(request):
-    return render(request, 'blog/base.html')
+    return render(request, "blog/base.html")
 
 
 def register(request):
@@ -48,6 +50,7 @@ def profile(request):
 # ------------------------
 # Post Views (CRUD)
 # ------------------------
+
 class PostListView(ListView):
     model = Post
     template_name = "blog/post_list.html"
@@ -62,7 +65,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ["title", "content"]
+    fields = ["title", "content", "tags"]   # 🔥 include tags
     template_name = "blog/post_form.html"
 
     def form_valid(self, form):
@@ -72,7 +75,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ["title", "content"]
+    fields = ["title", "content", "tags"]   # 🔥 include tags
     template_name = "blog/post_form.html"
 
     def form_valid(self, form):
@@ -97,44 +100,80 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 # ------------------------
 # Comment Views (CRUD)
 # ------------------------
-@login_required
+
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'blog/comment_form.html'
+    template_name = "blog/comment_form.html"
 
-    # Automatically link comment to the correct post and author
     def form_valid(self, form):
-        post_pk = self.kwargs.get('pk')  # URL will pass post's pk
-        form.instance.post = get_object_or_404(Post, pk=post_pk)
         form.instance.author = self.request.user
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs["pk"])
         return super().form_valid(form)
 
-    # Redirect to the post's detail page after saving comment
     def get_success_url(self):
-        return reverse('post-detail', kwargs={'pk': self.object.post.pk})
+        return self.object.post.get_absolute_url()
 
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'blog/comment_form.html'
+    template_name = "blog/comment_form.html"
 
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
 
     def get_success_url(self):
-        return reverse('post-detail', kwargs={'pk': self.object.post.pk})
+        return self.object.post.get_absolute_url()
 
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
-    template_name = 'blog/comment_confirm_delete.html'
+    template_name = "blog/comment_confirm_delete.html"
 
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
 
     def get_success_url(self):
-        return reverse('post-detail', kwargs={'pk': self.object.post.pk})
+        return self.object.post.get_absolute_url()
+
+
+# ------------------------
+# Search View
+# ------------------------
+
+def search_posts(request):
+    query = request.GET.get("q")
+    posts = Post.objects.all()
+
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+
+    return render(
+        request,
+        "blog/search_results.html",
+        {"posts": posts, "query": query}
+    )
+
+
+# ------------------------
+# Posts By Tag View
+# ------------------------
+
+def posts_by_tag(request, tag_name):
+    posts = Post.objects.filter(tags__name__iexact=tag_name)
+
+    return render(
+        request,
+        "blog/post_list.html",
+        {
+            "posts": posts,
+            "tag_name": tag_name
+        }
+    )

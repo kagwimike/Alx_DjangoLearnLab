@@ -21,7 +21,10 @@ class ProfileUpdateForm(UserChangeForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ["title", "content"]
+        fields = ["title", "content", 'tags']
+        widgets = {
+            'tags': forms.TextInput(attrs={'placeholder': 'Add tags separated by commas'}),
+        }
 
 class CommentForm(forms.ModelForm):
     class Meta:

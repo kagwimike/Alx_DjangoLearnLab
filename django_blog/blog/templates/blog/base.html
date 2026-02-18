@@ -8,3 +8,8 @@
     <h1>Welcome to Django Blog!</h1>
 </body>
 </html>
+
+<form method="GET" action="{% url 'search-posts' %}">
+    <input type="text" name="q" placeholder="Search posts...">
+    <button type="submit">Search</button>
+</form>
