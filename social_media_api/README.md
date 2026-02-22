@@ -35,3 +35,21 @@ Authorization: Token your_token_here
 - bio
 - profile_picture
 - followers
+
+
+## Posts Endpoints
+
+GET /api/posts/
+POST /api/posts/
+PUT /api/posts/{id}/
+DELETE /api/posts/{id}/
+
+Search Posts:
+/api/posts/?search=keyword
+
+## Comments Endpoints
+
+GET /api/comments/
+POST /api/comments/
+PUT /api/comments/{id}/
+DELETE /api/comments/{id}/
