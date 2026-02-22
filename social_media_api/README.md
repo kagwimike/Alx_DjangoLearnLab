@@ -53,3 +53,18 @@ GET /api/comments/
 POST /api/comments/
 PUT /api/comments/{id}/
 DELETE /api/comments/{id}/
+
+
+## Follow System
+
+Follow User:
+POST /api/accounts/follow/{user_id}/
+
+Unfollow User:
+POST /api/accounts/unfollow/{user_id}/
+
+## Feed
+
+GET /api/feed/
+
+Returns posts from followed users ordered by latest
