@@ -4,8 +4,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.decorators import permission_required, user_passes_test
-from .models import Book, Library
+
+from .models import Library
+from .models import Book
+
 from .forms import BookForm
+
 
 
 # =============================
