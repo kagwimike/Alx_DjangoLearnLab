@@ -1,0 +1,66 @@
+.navbar{
+  width:100%;
+  background:#0f172a;
+  padding:14px 40px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+.nav-container{
+  max-width:1200px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  color:white;
+  font-size:24px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+
+.nav-links a{
+  text-decoration:none;
+  color:#e2e8f0;
+  font-weight:500;
+  transition:0.3s;
+}
+
+.nav-links a:hover{
+  color:#38bdf8;
+}
+
+.login-link{
+  padding:8px 14px;
+  border-radius:6px;
+  background:#1e293b;
+}
+
+.register-link{
+  padding:8px 14px;
+  border-radius:6px;
+  background:#38bdf8;
+  color:white !important;
+}
+
+.logout-btn{
+  padding:8px 16px;
+  border:none;
+  border-radius:6px;
+  background:#ef4444;
+  color:white;
+  cursor:pointer;
+  font-weight:500;
+  transition:0.3s;
+}
+
+.logout-btn:hover{
+  background:#dc2626;
+}

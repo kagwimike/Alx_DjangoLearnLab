@@ -1,0 +1,85 @@
+/* --- CSS VARIABLES: For easy theme management --- */
+:root {
+  --primary: #64ffda;        /* Neon Teal */
+  --primary-glow: rgba(100, 255, 218, 0.3);
+  --bg-dark: #0a192f;        /* Deep Space Blue */
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --text-main: #afbdea;
+  --text-dim: #8892b0;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', "Segoe UI", system-ui, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* --- LAYOUT --- */
+.container {
+  max-width: 1100px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+/* --- THE UPGRADED GLASS CARD --- */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 30px;
+  margin: 25px 0;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 30px -10px rgba(2, 12, 27, 0.7);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(100, 255, 218, 0.4);
+  box-shadow: 0 20px 40px -15px rgba(2, 12, 27, 0.8);
+}
+
+/* --- THE NEON BUTTON --- */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: 4px; /* Sharper developer look */
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  background: var(--primary-glow);
+  box-shadow: 0 0 15px var(--primary-glow);
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* --- UTILITIES --- */
+h1, h2, h3 {
+  color: #c7a3a3;
+  margin-top: 0;
+}
+
+p {
+  color: var(--text-dim);
+}

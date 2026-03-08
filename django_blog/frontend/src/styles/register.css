@@ -1,0 +1,167 @@
+/* Container & Background */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #020617; /* Darkest Navy */
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Glassmorphism Card */
+.glass-morphic {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(15px) saturate(160%);
+  -webkit-backdrop-filter: blur(15px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  padding: 50px 40px;
+  width: 100%;
+  max-width: 450px;
+  z-index: 10;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Text Overlay Effects */
+.text-overlay-gradient {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.auth-subtitle {
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 35px;
+  font-size: 0.95rem;
+}
+
+/* Form Styling */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-box {
+  position: relative;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.input-box input:focus {
+  outline: none;
+  border-color: #60a5fa;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.2);
+}
+
+/* Password Eye Toggle */
+.password-field {
+  position: relative;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.toggle-eye:hover {
+  opacity: 1;
+}
+
+/* Register Button */
+.auth-btn {
+  margin-top: 10px;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+  filter: brightness(1.1);
+}
+
+.auth-footer {
+  margin-top: 25px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.auth-footer a {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Ambient Background Blobs */
+.auth-blob {
+  position: absolute;
+  filter: blur(80px);
+  z-index: 1;
+  border-radius: 50%;
+  opacity: 0.2;
+}
+
+.blob-1 {
+  width: 300px;
+  height: 300px;
+  background: #3b82f6;
+  top: -50px;
+  left: -50px;
+  animation: move 8s infinite alternate;
+}
+
+.blob-2 {
+  width: 250px;
+  height: 250px;
+  background: #ec4899;
+  bottom: -50px;
+  right: -50px;
+  animation: move 10s infinite alternate-reverse;
+}
+
+@keyframes move {
+  from { transform: translate(0, 0); }
+  to { transform: translate(30px, 40px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}

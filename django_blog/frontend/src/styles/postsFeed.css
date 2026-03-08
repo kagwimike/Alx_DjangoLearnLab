@@ -1,0 +1,111 @@
+/* Feed Layout */
+.feed-page {
+  background: #020617;
+  min-height: 100vh;
+  padding: 100px 20px;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+}
+
+.feed-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+}
+
+/* Header & Text Overlay */
+.feed-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.feed-title-text {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  margin-bottom: 10px;
+}
+
+.text-overlay-gradient {
+  background: linear-gradient(135deg, #f8fafc 30%, #64748b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+}
+
+.feed-subtitle {
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+/* Post Grid Architecture */
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  perspective: 1000px;
+}
+
+/* Staggered Entrance Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) rotateX(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+.post-card-wrapper {
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  /* Animation delay based on map index */
+  animation-delay: calc(var(--index) * 0.1s);
+}
+
+/* Glassmorphism Classes (Apply inside your PostCard.css too) */
+.glass-morphic {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+/* Loading Shimmer Effect */
+.skeleton-card {
+  height: 300px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+/* Ambient Lights */
+.ambient-light {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  filter: blur(150px);
+  opacity: 0.15;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.light-blue { top: -100px; right: -100px; background: #3b82f6; }
+.light-purple { bottom: -100px; left: -100px; background: #8b5cf6; }

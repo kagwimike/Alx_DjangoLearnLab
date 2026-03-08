@@ -1,0 +1,16 @@
+/* Forces the app to take up the full screen height */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Tells the middle content to fill all available space, pushing the footer down */
+.content-grow {
+  flex: 1;
+}
+
+/* Optional: Add smooth scrolling for the whole app */
+html {
+  scroll-behavior: smooth;
+}
