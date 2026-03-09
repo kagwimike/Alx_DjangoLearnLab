@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
 import "../styles/postDetails.css";
 
 function PostDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  
+  // State
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
@@ -13,11 +16,8 @@ function PostDetails() {
   const [replyText, setReplyText] = useState({});
   const [replyingToId, setReplyingToId] = useState(null);
 
-  useEffect(() => {
-    fetchPost();
-  }, [id]);
-
-  const fetchPost = async () => {
+  // 1. Memoized Fetch Function (Fixes ESLint warning)
+  const fetchPost = useCallback(async () => {
     try {
       const res = await API.get(`posts/${id}/`);
       setPost(res.data);
@@ -25,9 +25,28 @@ function PostDetails() {
     } catch (err) {
       console.error("Failed to fetch post:", err);
     }
+  }, [id]);
+
+  useEffect(() => {
+    fetchPost();
+  }, [fetchPost]);
+
+  // --- Post Management Handlers ---
+  const handleDeletePost = async () => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    try {
+      await API.delete(`posts/${id}/`);
+      navigate("/"); // Redirect to feed after deletion
+    } catch (err) {
+      alert("Error deleting post. You may not have permission.");
+    }
   };
 
-  // --- Handlers (Logic) ---
+  const handleEditPost = () => {
+    navigate(`/posts/${id}/edit`); // Adjust path based on your App.js routing
+  };
+
+  // --- Comment Handlers ---
   const handleCommentSubmit = async (e, parentId = null) => {
     e.preventDefault();
     const content = parentId ? replyText[parentId] : commentText;
@@ -56,12 +75,9 @@ function PostDetails() {
   const handleUpvote = async (commentId) => {
     try {
       const response = await API.post(`comments/${commentId}/upvote/`);
-      // Update state locally to keep it "snappy"
       setComments(updateCommentInList(comments, commentId, response.data.upvotes));
     } catch (err) {
-      if (err.response?.status === 400) {
-        alert(err.response.data.error);
-      }
+      if (err.response?.status === 400) alert(err.response.data.error);
     }
   };
 
@@ -85,14 +101,11 @@ function PostDetails() {
     }
   };
 
-  // --- Recursive Helpers ---
+  // --- Recursive Helpers (Keep as is) ---
   const updateNestedReplies = (list, parentId, newReply) =>
     list.map((c) => {
-      if (c.id === parentId) {
-        return { ...c, replies: [...(c.replies || []), newReply] };
-      } else if (c.replies?.length) {
-        return { ...c, replies: updateNestedReplies(c.replies, parentId, newReply) };
-      }
+      if (c.id === parentId) return { ...c, replies: [...(c.replies || []), newReply] };
+      if (c.replies?.length) return { ...c, replies: updateNestedReplies(c.replies, parentId, newReply) };
       return c;
     });
 
@@ -121,11 +134,7 @@ function PostDetails() {
   // --- Recursive Component Render ---
   const renderComments = (commentsList, depth = 0) =>
     commentsList.map((comment) => (
-      <div 
-        key={comment.id} 
-        className={`comment-thread ${depth > 0 ? 'nested' : ''}`}
-        style={{ '--depth': depth }}
-      >
+      <div key={comment.id} className={`comment-thread ${depth > 0 ? 'nested' : ''}`} style={{ '--depth': depth }}>
         <div className="comment-card glass-panel-sm">
           <div className="comment-header">
             <span className="comment-author">@{comment.author.username}</span>
@@ -152,7 +161,6 @@ function PostDetails() {
               <p className="comment-body">{comment.content}</p>
               <div className="comment-actions">
                 <button className="action-link" onClick={() => setReplyingToId(comment.id)}>Reply</button>
-                {/* Only show edit/delete if user is the author (assuming logic is handled by backend too) */}
                 <button className="action-link" onClick={() => { setEditingCommentId(comment.id); setEditedText(comment.content); }}>Edit</button>
                 <button className="action-link delete" onClick={() => handleDeleteComment(comment.id)}>Delete</button>
               </div>
@@ -186,9 +194,14 @@ function PostDetails() {
       <div className="orb post-orb-2"></div>
 
       <div className="post-details-container">
-        {/* Main Post Content */}
         <article className="post-card glass-card animate-slide-up">
           <header className="post-header">
+            {/* Admin Actions for Post */}
+            <div className="post-admin-actions">
+              <button className="action-btn edit" onClick={handleEditPost}>Edit Post</button>
+              <button className="action-btn delete" onClick={handleDeletePost}>Delete Post</button>
+            </div>
+            
             <h1 className="post-title text-gradient">{post.title}</h1>
             <div className="post-meta">
               <span className="author-badge">@{post.author.username}</span>
@@ -196,18 +209,13 @@ function PostDetails() {
               <time>{new Date(post.published_date).toLocaleDateString(undefined, { dateStyle: 'long' })}</time>
             </div>
             <div className="post-tags">
-              {post.tags.map((tag) => (
-                <span key={tag} className="tag-chip">{tag}</span>
-              ))}
+              {post.tags.map((tag) => <span key={tag} className="tag-chip">{tag}</span>)}
             </div>
           </header>
 
-          <div className="post-content-body">
-            {post.content}
-          </div>
+          <div className="post-content-body">{post.content}</div>
         </article>
 
-        {/* Discussion Section */}
         <section className="comments-section animate-fade-in">
           <div className="section-header">
             <h2 className="section-title">Discussion</h2>
@@ -219,12 +227,9 @@ function PostDetails() {
               <div className="no-comments-placeholder glass-panel-sm">
                 <p>No comments yet. Start the conversation!</p>
               </div>
-            ) : (
-              renderComments(comments)
-            )}
+            ) : renderComments(comments)}
           </div>
 
-          {/* Root Comment Form */}
           <div className="main-comment-form glass-card">
             <h3>Share your thoughts</h3>
             <form onSubmit={(e) => handleCommentSubmit(e)}>

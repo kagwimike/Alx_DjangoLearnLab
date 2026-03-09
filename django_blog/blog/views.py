@@ -42,6 +42,20 @@ def register(request):
         form = RegisterForm()
     return render(request, "blog/register.html", {"form": form})
 
+
+def search_posts(request):
+    query = request.GET.get("q")
+    results = []
+
+    if query:
+        results = Post.objects.filter(title__icontains=query)
+
+    return render(request, "blog/search_results.html", {
+        "query": query,
+        "results": results
+    })
+
+
 @login_required
 def profile(request):
     if request.method == "POST":
@@ -135,87 +149,150 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 # ---------------------------------------------------------
 # 2. API VIEWS (React Frontend)
 # ---------------------------------------------------------
+# ---------------------------------------------------------
+# 2. API VIEWS (React Frontend)
+# ---------------------------------------------------------
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def user_profile_api(request):
-    """
-    Directly query the models to avoid AttributeError on the User object.
-    """
     user = request.user
-    
-    # We query the classes directly using the 'author' field
-    # (Check your Post model: if the field is 'user', change author=user to user=user)
+
     post_count = Post.objects.filter(author=user).count()
     comment_count = Comment.objects.filter(author=user).count()
 
     return Response({
-        'username': user.username,
-        'post_count': post_count,
-        'comment_count': comment_count,
-        'date_joined': user.date_joined
+        "username": user.username,
+        "post_count": post_count,
+        "comment_count": comment_count,
+        "date_joined": user.date_joined
     })
+
+
+# -------------------------
+# Register
+# -------------------------
 
 class RegisterAPI(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         username = request.data.get("username")
         email = request.data.get("email")
         password = request.data.get("password")
+
         if not username or not password:
-            return Response({"error": "Username/password required"}, status=400)
+            return Response({"error": "Username and password required"}, status=400)
+
         if User.objects.filter(username=username).exists():
-            return Response({"error": "Exists"}, status=400)
-        User.objects.create_user(username=username, email=email, password=password)
-        return Response({"message": "Created"}, status=201)
+            return Response({"error": "User already exists"}, status=400)
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        return Response({
+            "message": "User created",
+            "username": user.username
+        }, status=201)
+
+
+# -------------------------
+# Posts
+# -------------------------
 
 class PostListAPI(generics.ListCreateAPIView):
     queryset = Post.objects.all().order_by("-created_at")
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(
+            author=self.request.user,
+            published_date=timezone.now()
+        )
+
 
 class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def perform_update(self, serializer):
+        if self.request.user != self.get_object().author:
+            raise PermissionError("You cannot edit this post")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if self.request.user != instance.author:
+            raise PermissionError("You cannot delete this post")
+        instance.delete()
+
+
+# -------------------------
+# Comments
+# -------------------------
+
 class CommentCreateAPI(generics.CreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
+
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        post_id = self.request.data.get("post")
+        post = get_object_or_404(Post, id=post_id)
+
+        serializer.save(
+            author=self.request.user,
+            post=post
+        )
+
 
 class CommentDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-@api_view(['POST'])
+    def perform_update(self, serializer):
+        if self.request.user != self.get_object().author:
+            raise PermissionError("You cannot edit this comment")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if self.request.user != instance.author:
+            raise PermissionError("You cannot delete this comment")
+        instance.delete()
+
+
+# -------------------------
+# Comment Upvote
+# -------------------------
+
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def comment_upvote(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
-    comment.upvotes += 1
+
+    if comment.author == request.user:
+        return Response({"error": "You cannot upvote your own comment"}, status=400)
+
+    comment.upvotes = (comment.upvotes or 0) + 1
     comment.save()
+
     return Response({"upvotes": comment.upvotes})
 
-# ---------------------------------------------------------
-# 3. SEARCH & UTILS
-# ---------------------------------------------------------
 
-def search_posts(request):
-    query = request.GET.get("q")
-    posts = Post.objects.all()
-    if query:
-        posts = posts.filter(
-            Q(title__icontains=query) | Q(content__icontains=query) | Q(tags__name__icontains=query)
-        ).distinct()
-    return render(request, "blog/search_results.html", {"posts": posts, "query": query})
+# -------------------------
+# Post Upvote
+# -------------------------
 
-@require_POST
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def upvote_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    post.upvotes += 1
+
+    post.upvotes = (post.upvotes or 0) + 1
     post.save()
-    return JsonResponse({"upvotes": post.upvotes})
+
+    return Response({"upvotes": post.upvotes})
